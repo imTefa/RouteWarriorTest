@@ -27,6 +27,10 @@ public class LoginTest extends ActivityInstrumentationTestCase2 {
     private Solo solo;
     private Date sDate;
 
+
+    //change some thinga ssdf asfsdf asfasdf
+
+
     //file chooser dialog
     Dialog dialog;
     private String[] mFileList;
