@@ -7,9 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
 import android.test.ActivityInstrumentationTestCase2;
-
 import com.robotium.solo.Solo;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,9 +17,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Date;
 
-/**
- * Created by Tefa on 20/09/2016.
- */
 public class HomeScreenTest extends ActivityInstrumentationTestCase2 {
     private Solo solo;
     Date sDate;
