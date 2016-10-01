@@ -229,6 +229,8 @@ public class HomeScreenTest extends ActivityInstrumentationTestCase2 {
     }
 
     private void selectRoute() {
+        //choose random route
+        //handle noneditable route
         solo.clickOnView(solo.getView(android.R.id.text1));
         solo.clickOnView(solo.getView(android.R.id.button1));
     }

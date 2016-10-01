@@ -1,0 +1,48 @@
+-- Merging decision tree log ---
+manifest
+ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:1:55-10:145
+	package
+		ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:1:174-220
+	android:versionName
+		ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:1:148-173
+		INJECTED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml
+		INJECTED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml
+	android:versionCode
+		ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:1:124-147
+		INJECTED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml
+		INJECTED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:1:65-123
+application
+ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:2:5-9:19
+	android:label
+		ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:2:55-87
+	android:icon
+		ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:2:18-54
+activity#com.desertmicro.android.routewarrior.LoginActivity
+ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:3:9-8:20
+	android:label
+		ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:3:19-51
+	android:name
+		ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:3:52-80
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:4:13-7:29
+action#android.intent.action.MAIN
+ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:5:17-68
+	android:name
+		ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:5:25-66
+category#android.intent.category.LAUNCHER
+ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:6:17-76
+	android:name
+		ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:6:27-74
+instrumentation#android.test.InstrumentationTestRunner
+ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:10:1-134
+	android:targetPackage
+		ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:10:72-132
+	android:name
+		ADDED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml:10:18-71
+uses-sdk
+INJECTED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml reason: use-sdk injection requested
+	android:minSdkVersion
+		INJECTED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml
+		INJECTED from D:\ADWorkSpace\WorkExamples\RouteWarriorTest\Truck-inspection-test\src\main\AndroidManifest.xml
