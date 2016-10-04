@@ -6,13 +6,11 @@ import android.app.Instrumentation;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.*;
 import android.widget.CheckBox;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 
 @SuppressWarnings("rawtypes")
@@ -20,7 +18,8 @@ public class TruckInspection extends ActivityInstrumentationTestCase2 {
     private Solo solo;
     //number & list of defective
     private int nDef;
-    private ArrayList<String> defList = new ArrayList<>();
+    private ArrayList<String> preDefList = new ArrayList<>();
+    private ArrayList<String> postDefList = new ArrayList<>();
 
     private static final String LAUNCHER_ACTIVITY_FULL_CLASSNAME = "com.desertmicro.android.routewarrior.activities.LoginActivity";
 
@@ -123,7 +122,7 @@ public class TruckInspection extends ActivityInstrumentationTestCase2 {
                 android.widget.CheckBox cb = solo.getView(CheckBox.class, index);
                 String name = (String) cb.getText();
                 Log.e("Checkbox......", name + " , " + item);
-                defList.add(name);
+                preDefList.add(name);
             }
         }
         //click on next
@@ -200,11 +199,123 @@ public class TruckInspection extends ActivityInstrumentationTestCase2 {
         //Click on Post-Trip
         solo.clickOnView(solo.getView(android.widget.TextView.class, 8));
         //click on start
-        solo.clickOnView(solo.getView("start"));
-
-
-
+        solo.clickOnView(solo.getView("start", 1));
+        //intiate GridView
+        gv = solo.getView(GridView.class, 1);
+        //get gridVIew count
+        count = gv.getCount();
+        nDef = randomItem(count);
+        for (int i = 0; i < nDef; i++) {
+            int item = randomItem(count);
+            solo.scrollListToLine(gv, item - 1);
+            if (item % 2 == 0) {
+                CheckBox cb = solo.getView(CheckBox.class, 6);
+                if (!cb.isChecked()) {
+                    solo.clickOnCheckBox(6);
+                    postDefList.add((String) cb.getText());
+                }
+            } else {
+                CheckBox cb = solo.getView(CheckBox.class, 7);
+                if (!cb.isChecked()) {
+                    solo.clickOnCheckBox(7);
+                    postDefList.add((String) cb.getText());
+                }
+            }
+            solo.sleep(1000);
+        }
+        //click on next
+        solo.clickOnView(solo.getView("next",1));
+        solo.sleep(1000);
+        //click on Enter remark button
+        solo.clickOnView(solo.getView("rem_button",1));
+        //click on remarks EditText,clear it and enter remark
+        //solo.clickOnView(solo.getView("edit_box")); // commented to save time
+        solo.clearEditText((android.widget.EditText) solo.getView("edit_box"));
+        solo.enterText((android.widget.EditText) solo.getView("edit_box"), "Brakes are loud");
+        //click buton ok
+        solo.clickOnView(solo.getView("ok"));
+        //click on enter Odometer reading button
+        solo.clickOnView(solo.getView("mileage",1));
+        //click on Odometer reading EditText,clear it and enter value
+        //solo.clickOnView(solo.getView("edit_box")); // commented to save time
+        solo.clearEditText((android.widget.EditText) solo.getView("edit_box"));
+        solo.enterText((android.widget.EditText) solo.getView("edit_box"), "25369");
+        //click buton ok
+        solo.clickOnView(solo.getView("ok"));
+        //click on select mechanic
+        solo.clickOnView(solo.getView("mech_name",1));
+        //list of mechanics
+        mechList = solo.getView(ListView.class, 0);
+        //get list count
+        count = mechList.getCount();
+        rNum = randomItem(count);
+        //click on randomly selected item
+        solo.clickOnView(getViewAtIndex(mechList, rNum, getInstrumentation()));
+        //click on ok
+        solo.clickOnView(solo.getView("ok"));
+        //sleep for 2 second
+        solo.sleep(2000);
+        //Click on Select work completed date and time
+        solo.clickOnView(solo.getView("complete_date",1));
+        //Click on OK
+        solo.clickOnView(solo.getView("ok"));
+        //Click on Capture mechanic signature button
+        solo.clickOnView(solo.getView("mech_sig_btn",1));
+        //Draw signature
+        /*screenWidth = getActivity().getWindowManager().getDefaultDisplay().getWidth();
+        screenHeight = getActivity().getWindowManager().getDefaultDisplay().getHeight();
+        //fromX, toX, fromY, toY = 0;
+        fromX = screenWidth / 2;
+        toX = screenWidth / 2;
+        fromY = (screenHeight / 2) + (screenHeight / 3);
+        toY = (screenHeight / 2) - (screenHeight / 3);*/
+        solo.drag(fromX, toX, fromY, toY, 40);
+        //Click on Save
+        solo.clickOnView(solo.getButton("Save"));
+        //optional scroll on small screens
+        solo.drag(fromX, toX, fromY, toY, 40);
+        solo.sleep(2000);
+        //click on Capture driver signature button
+        solo.clickOnView(solo.getView("driver_sig_btn",1));
+        solo.drag(fromX, toX, fromY, toY, 40);
+        //Click on Save
+        solo.clickOnView(solo.getButton("Save"));
+        //click on submit button
+        solo.clickOnView(solo.getView("save",1));
+        //slepp for 2 seconds
+        solo.sleep(2000);
+        //click on action bar home button
+        solo.clickOnActionBarHomeButton();
+        //click on truck inspection
+        solo.clickOnView(solo.getView("inspection"));
+        //click on pre-trip history
+        solo.clickOnView(solo.getView(android.widget.TextView.class, 10));
+        //select item from pre-trip history on
+        solo.clickInList(1, 3);
+        //click ok
+        solo.clickOnView(solo.getView("ok"));
+        solo.sleep(1000);
+        //click on close button
+        solo.clickOnView(solo.getView("exit"));
+        //logout
+        logout();
         solo.sleep(5000);
+    }
+
+    private void logout() {
+        //click logout form list
+        solo.sendKey(solo.MENU);
+        solo.clickInList(4);
+        solo.waitForDialogToOpen(1000);
+        //click on logout button
+        solo.clickOnView(solo.getView(android.R.id.button1));
+        solo.waitForDialogToOpen(1000);
+        //select route status
+        solo.clickOnView(solo.getView(android.R.id.text1, 0));
+        //click ok
+        solo.clickOnView(solo.getView(android.R.id.button1));
+        solo.setActivityOrientation(Solo.PORTRAIT);
+
     }
 
 

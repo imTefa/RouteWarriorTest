@@ -20,7 +20,6 @@ import java.util.Date;
 public class HomeScreenTest extends ActivityInstrumentationTestCase2 {
     private Solo solo;
     Date sDate;
-
     //file chooser dialog
     Dialog dialog;
     private String[] mFileList;
