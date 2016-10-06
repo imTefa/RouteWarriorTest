@@ -10,9 +10,9 @@ import android.os.Environment;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ListView;
 
@@ -28,15 +28,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Created by Tefa on 03/10/2016.
+ * Created by Tefa on 06/10/2016.
  */
-public class TruckInspectionTestFinal extends ActivityInstrumentationTestCase2 {
+public class TruckInspectionTestOrganized extends ActivityInstrumentationTestCase2 {
 
     Solo solo;
     private static final String LAUNCHER_ACTIVITY_FULL_CLASSNAME = "com.desertmicro.android.routewarrior.activities.LoginActivity";
     private static Class<?> launcherActivityClass;
+
     Date sDate;
     //file chooser dialog
     Dialog dialog;
@@ -47,7 +49,7 @@ public class TruckInspectionTestFinal extends ActivityInstrumentationTestCase2 {
     private static final int DIALOG_LOAD_FILE = 1000;
     private ArrayList<String> preDefList = new ArrayList<>();
     private ArrayList<String> postDefList = new ArrayList<>();
-    int count,rNum;
+    int count, rNum;
 
     static {
         try {
@@ -57,8 +59,9 @@ public class TruckInspectionTestFinal extends ActivityInstrumentationTestCase2 {
         }
     }
 
+
     @SuppressWarnings("unchecked")
-    public TruckInspectionTestFinal() throws ClassNotFoundException {
+    public TruckInspectionTestOrganized() throws ClassNotFoundException {
         super(launcherActivityClass);
     }
 
@@ -99,7 +102,7 @@ public class TruckInspectionTestFinal extends ActivityInstrumentationTestCase2 {
                 String[] user = line.split(",");
                 // start date
                 sDate = new Date();
-                run(user[0], user[1]);
+                userIspect(user[0], user[1]);
             }
             br.close();
             openResultFile();
@@ -110,7 +113,7 @@ public class TruckInspectionTestFinal extends ActivityInstrumentationTestCase2 {
         }
     }
 
-    private void run(String username, String password) {
+    private void userIspect(String username, String password) {
         //call signIn method
         signIn(username, password);
         //wait for dialog
@@ -130,14 +133,14 @@ public class TruckInspectionTestFinal extends ActivityInstrumentationTestCase2 {
             truckInspection();
             //print result
             try {
-                printResult(true,username);
+                printResult(true, username);
             } catch (IOException e) {
                 e.printStackTrace();
             }
             //logout
             logout();
             solo.sleep(5000);
-        }else{
+        } else {
             //handle login fail dialog
             //click ok
             solo.clickOnView(solo.getView(android.R.id.button1));
@@ -150,13 +153,50 @@ public class TruckInspectionTestFinal extends ActivityInstrumentationTestCase2 {
         }
     }
 
+
+    private void signIn(String userName, String password) {
+        //click on userId editText
+        solo.clickOnView(solo.getView("userId"));
+        //clear editText and sumbit userName
+        solo.clearEditText((android.widget.EditText) solo.getView("userId"));
+        solo.enterText((android.widget.EditText) solo.getView("userId"), userName);
+        //click on password editText
+        solo.clickOnView(solo.getView("password"));
+        //clear editText and sumbit password
+        solo.clearEditText((android.widget.EditText) solo.getView("password"));
+        solo.enterText((android.widget.EditText) solo.getView("password"), password);
+        solo.clickOnView(solo.getView("userId"));
+        //Click on Sign in
+        solo.clickOnView(solo.getView("sign_in_button"));
+    }
+
+    private void selectRoute() {
+        //initiate select route listView
+        ListView routeList = solo.getView(ListView.class, 0);
+        //get list size
+        count = routeList.getCount();
+        //select random route from list
+        rNum = randomItem(count);
+        solo.clickOnView(getViewAtIndex(routeList, rNum, getInstrumentation()));
+        //click ok button
+        solo.clickOnView(solo.getView(android.R.id.button1));
+    }
+
+    private void handleRandomDialog() {
+        if (solo.waitForDialogToOpen()) {
+            solo.clickOnView(solo.getView(android.R.id.button1));
+        }
+    }
+
     private void truckInspection() {
+        /****select truck****/
         //click on action bar home button
         solo.clickOnActionBarHomeButton();
         //click on truck inspection
         solo.clickOnView(solo.getView("inspection"));
         //wait for inspection activity
         solo.waitForActivity("InspectionActivity");
+        solo.sleep(1000);
         //click on select truck
         solo.clickOnView(solo.getView("truckId"));
         //initiate select truck list
@@ -170,34 +210,13 @@ public class TruckInspectionTestFinal extends ActivityInstrumentationTestCase2 {
         solo.clickOnView(solo.getView(android.R.id.button1));
         //sleep for second
         solo.sleep(1000);
+        /****Pre-trip inspection****/
+        //click on pre-trip tab
+        solo.clickOnText("Pre-Trip");
         //click on start button
         solo.clickOnView(solo.getView("start"));
-        //initiate GridView of truck defective items
-        GridView gv = solo.getView(GridView.class, 0);
-        //number of items in GridView
-        count = gv.getCount();
-        //choose randomly number of defective items in truck
-        int nDef = randomItem(count);
-        //choose this items randomly
-        for (int i = 0; i < nDef; i++) {
-            int item = randomItem(count);
-            /*
-            * select item
-            * to select item number x in gridView, scroll to line x-1 and select item number x%4
-            *
-            * note: I get this way experimentally
-            */
-            solo.scrollListToLine(gv, item - 1);
-            //index of item in line
-            int index = item % 4;
-            if (!solo.isCheckBoxChecked(index)) {
-                solo.clickOnCheckBox(index);
-                android.widget.CheckBox cb = solo.getView(CheckBox.class, index);
-                String name = (String) cb.getText();
-                Log.e("Checkbox......", name + " , " + item);
-                preDefList.add(name);
-            }
-        }
+        //select pre trip defective items
+        selectPreTripDefectiveItems();
         //click on next
         solo.clickOnView(solo.getView("next"));
         solo.sleep(1000);
@@ -266,40 +285,20 @@ public class TruckInspectionTestFinal extends ActivityInstrumentationTestCase2 {
         //sleep for second
         solo.sleep(1000);
         //click on pre-trip history
-        solo.clickOnView(solo.getView(android.widget.TextView.class, 9));
+        solo.clickOnText("Pre-Trip History");
         //select item from pre-trip history on
         solo.clickInList(1, 2);
         //click ok
         solo.clickOnView(solo.getView("ok"));
         //sleep for second
         solo.sleep(1000);
+        /****Post-trip inspection****/
         //Click on Post-Trip
-        solo.clickOnView(solo.getView(android.widget.TextView.class, 8));
+        solo.clickOnText("Post-Trip");
         //click on start
         solo.clickOnView(solo.getView("start", 1));
-        //intiate GridView
-        gv = solo.getView(GridView.class, 1);
-        //get gridVIew count
-        count = gv.getCount();
-        nDef = randomItem(count);
-        for (int i = 0; i < nDef; i++) {
-            int item = randomItem(count);
-            solo.scrollListToLine(gv, item - 1);
-            if (item % 2 == 0) {
-                CheckBox cb = solo.getView(CheckBox.class, 6);
-                if (!cb.isChecked()) {
-                    solo.clickOnCheckBox(6);
-                    postDefList.add((String) cb.getText());
-                }
-            } else {
-                CheckBox cb = solo.getView(CheckBox.class, 7);
-                if (!cb.isChecked()) {
-                    solo.clickOnCheckBox(7);
-                    postDefList.add((String) cb.getText());
-                }
-            }
-            solo.sleep(1000);
-        }
+        //select post trip defective items
+        selectPostTripDefectiveItems();
         //click on next
         solo.clickOnView(solo.getView("next", 1));
         solo.sleep(1000);
@@ -339,13 +338,6 @@ public class TruckInspectionTestFinal extends ActivityInstrumentationTestCase2 {
         //Click on Capture mechanic signature button
         solo.clickOnView(solo.getView("mech_sig_btn", 1));
         //Draw signature
-        /*screenWidth = getActivity().getWindowManager().getDefaultDisplay().getWidth();
-        screenHeight = getActivity().getWindowManager().getDefaultDisplay().getHeight();
-        //fromX, toX, fromY, toY = 0;
-        fromX = screenWidth / 2;
-        toX = screenWidth / 2;
-        fromY = (screenHeight / 2) + (screenHeight / 3);
-        toY = (screenHeight / 2) - (screenHeight / 3);*/
         solo.drag(fromX, toX, fromY, toY, 40);
         //Click on Save
         solo.clickOnView(solo.getButton("Save"));
@@ -367,73 +359,88 @@ public class TruckInspectionTestFinal extends ActivityInstrumentationTestCase2 {
         solo.clickOnView(solo.getView("inspection"));
         //sleep for second
         solo.sleep(1000);
-        //click on pre-trip history
-        solo.clickOnView(solo.getView(android.widget.TextView.class, 10));
-        //select item from pre-trip history on
+        //click on post-trip history
+        solo.clickOnText("Post-Trip History");
+        //select item from post-trip history on
         solo.clickInList(1, 3);
         //click ok
         solo.clickOnView(solo.getView("ok"));
         solo.sleep(1000);
         //click on close button
         solo.clickOnView(solo.getView("exit"));
-    }
-
-    private void selectRoute() {
-        //initiate select route listView
-        ListView routeList = solo.getView(ListView.class, 0);
-        //get list size
-        count = routeList.getCount();
-        //select random route from list
-        rNum = randomItem(count);
-        solo.clickOnView(getViewAtIndex(routeList, rNum, getInstrumentation()));
-        //click ok button
-        solo.clickOnView(solo.getView(android.R.id.button1));
-    }
-
-    private void signIn(String userName, String password) {
-        //click on userId editText
-        solo.clickOnView(solo.getView("userId"));
-        //clear editText and sumbit userName
-        solo.clearEditText((android.widget.EditText) solo.getView("userId"));
-        solo.enterText((android.widget.EditText) solo.getView("userId"), userName);
-        //click on password editText
-        solo.clickOnView(solo.getView("password"));
-        //clear editText and sumbit password
-        solo.clearEditText((android.widget.EditText) solo.getView("password"));
-        solo.enterText((android.widget.EditText) solo.getView("password"), password);
-        solo.clickOnView(solo.getView("userId"));
-        //Click on Sign in
-        solo.clickOnView(solo.getView("sign_in_button"));
-    }
-
-
-    private void logout() {
-        //click logout form list
-        solo.sendKey(solo.MENU);
-        solo.clickInList(4);
-        solo.waitForDialogToOpen(1000);
-        //click on logout button
-        solo.clickOnView(solo.getView(android.R.id.button1));
-        solo.waitForDialogToOpen(1000);
-        //select route status
-        solo.clickOnView(solo.getView(android.R.id.text1, 0));
-        //click ok
-        solo.clickOnView(solo.getView(android.R.id.button1));
-        solo.setActivityOrientation(Solo.PORTRAIT);
 
     }
 
+
+    private void selectPreTripDefectiveItems() {
+        //initiate GridView
+        GridView gridView = (GridView) solo.getView("truck_points");
+        //GridView child count
+        int gvCount = gridView.getCount();
+        //GridView number of columns
+        int nColumn = gridView.getNumColumns();
+        //GridView number of childes in view
+        int currentChilds = gridView.getChildCount();
+        //randomly choose number of defective items
+        int numOfSelectedItems = randomItem(gvCount);
+        for (int i = 0; i < numOfSelectedItems; i++) {
+            //choose item number random
+            int r = randomItem(gvCount);
+            //get item index in view
+            int index = r % nColumn;
+            //scroll to item line
+            scrollListTo(gridView, r, getInstrumentation());
+            //get checkBox parent view
+            ViewGroup viewGroup = (ViewGroup) gridView.getChildAt(index);
+            //get checkBox
+            CheckBox checkBox = (CheckBox) viewGroup.getChildAt(0);
+            //check if checkbox is checked
+            if (!checkBox.isChecked()) {
+                solo.clickOnView(viewGroup);
+                preDefList.add((String) checkBox.getText());
+                solo.sleep(1000);
+                //Log.e(TAG, "GV#1," + " column: " + nColumn + " " + checkBox.getText() + " item: " + r + ", index: " + index);
+            }
+        }
+    }
+
+    private void selectPostTripDefectiveItems() {
+        //initiate GridView
+        GridView gridView = (GridView) solo.getView("truck_points", 1);
+        //GridView child count
+        int gvCount = gridView.getCount();
+        //GridView number of columns
+        int nColumn = gridView.getNumColumns();
+        //GridView number of childes in view
+        int currentChilds = gridView.getChildCount();
+        //randomly choose number of defective items
+        int numOfSelectedItems = randomItem(gvCount);
+        for (int i = 0; i < numOfSelectedItems; i++) {
+            //choose item number random
+            int r = randomItem(gvCount);
+            //get item index in view
+            int index = r % nColumn;
+            //scroll to item line
+            scrollListTo(gridView, r, getInstrumentation());
+            //get checkBox parent view
+            ViewGroup viewGroup = (ViewGroup) gridView.getChildAt(index);
+            //get checkBox
+            CheckBox checkBox = (CheckBox) viewGroup.getChildAt(0);
+            //check if checkbox is checked
+            if (!checkBox.isChecked()) {
+                solo.clickOnView(viewGroup);
+                preDefList.add((String) checkBox.getText());
+                solo.sleep(1000);
+                //Log.e(TAG, "GV#1," + " column: " + nColumn + " " + checkBox.getText() + " item: " + r + ", index: " + index);
+            }
+        }
+    }
 
     //return random number from 0 to max
     private int randomItem(int max) {
-        //if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-        //  return ThreadLocalRandom.current().nextInt(0,max);
-        //}else{
-        Random rand = new Random();
-        return rand.nextInt(max);
-        //}
+            Random rand = new Random();
+            return rand.nextInt(max);
     }
-
 
     public View getViewAtIndex(final ListView listElement, final int indexInList, Instrumentation instrumentation) {
         ListView parent = listElement;
@@ -456,6 +463,23 @@ public class TruckInspectionTestFinal extends ActivityInstrumentationTestCase2 {
             }
         });
         instrumentation.waitForIdleSync();
+    }
+
+
+    private void logout() {
+        //click logout form list
+        solo.sendKey(solo.MENU);
+        solo.clickInList(4);
+        solo.waitForDialogToOpen(1000);
+        //click on logout button
+        solo.clickOnView(solo.getView(android.R.id.button1));
+        solo.waitForDialogToOpen(1000);
+        //select route status
+        solo.clickOnView(solo.getView(android.R.id.text1, 0));
+        //click ok
+        solo.clickOnView(solo.getView(android.R.id.button1));
+        solo.setActivityOrientation(Solo.PORTRAIT);
+
     }
 
     //run dialog in UI
@@ -536,7 +560,7 @@ public class TruckInspectionTestFinal extends ActivityInstrumentationTestCase2 {
         if (!dir.exists()) {
             dir.mkdir();
         }
-        File file = new File(dir, "Result_Test.txt");
+        File file = new File(dir, "Result.txt");
         FileWriter fw = new FileWriter(file);
         fw.write(s);
         fw.flush();
@@ -561,11 +585,5 @@ public class TruckInspectionTestFinal extends ActivityInstrumentationTestCase2 {
         Uri uri = Uri.parse("file:///sdcard/Test_Result/Result.txt");
         intent.setDataAndType(uri, "text/plain");
         getActivity().startActivity(intent);
-    }
-
-    private void handleRandomDialog() {
-        if (solo.waitForDialogToOpen()) {
-            solo.clickOnView(solo.getView(android.R.id.button1));
-        }
     }
 }
